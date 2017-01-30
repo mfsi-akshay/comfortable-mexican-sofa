@@ -50,6 +50,18 @@ class CreateCms < ActiveRecord::Migration
     add_index :comfy_cms_pages, [:site_id, :full_path]
     add_index :comfy_cms_pages, [:parent_id, :position]
 
+    # -- LocalePages --------------------------------------------------------------
+    create_table :comfy_cms_locale_pages do |t|
+      t.integer :page_id,         :null => false
+      t.integer :layout_id
+      t.string :locale,           :null => false
+      t.string  :label,           :null => false
+      t.text    :content_cache,   :limit => 16777215
+      t.boolean :is_published,    :null => false, :default => true
+      t.timestamps
+    end
+    add_index :comfy_cms_locale_pages, [:page_id]
+
     # -- Page Blocks --------------------------------------------------------
     create_table :comfy_cms_blocks do |t|
       t.string     :identifier,  :null => false
@@ -122,6 +134,7 @@ class CreateCms < ActiveRecord::Migration
     drop_table :comfy_cms_sites
     drop_table :comfy_cms_layouts
     drop_table :comfy_cms_pages
+    drop_table :comfy_cms_locale_pages
     drop_table :comfy_cms_snippets
     drop_table :comfy_cms_blocks
     drop_table :comfy_cms_files
@@ -130,4 +143,3 @@ class CreateCms < ActiveRecord::Migration
     drop_table :comfy_cms_categorizations
   end
 end
-
