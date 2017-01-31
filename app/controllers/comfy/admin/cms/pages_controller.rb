@@ -2,6 +2,8 @@ class Comfy::Admin::Cms::PagesController < Comfy::Admin::Cms::BaseController
   before_action :check_for_layouts, :only => [:new, :edit]
   before_action :build_cms_page,    :only => [:new, :create]
   before_action :load_cms_page,     :only => [:edit, :update, :destroy]
+  before_action :load_locale_page,  :only => [:update_locale]
+  before_action :build_cms_locale_page, only: [:create_locale, :update_locale]
   before_action :authorize
   before_action :preview_cms_page,  :only => [:create, :update]
 
@@ -23,7 +25,27 @@ class Comfy::Admin::Cms::PagesController < Comfy::Admin::Cms::BaseController
     render
   end
 
+  def new_locale_page
+    @current_page = @site.pages.find(params[:id])
+    @locale_page = @current_page.locale_pages.new(page_params)
+    @locale_page.layout ||= @site.layouts.first
+    render
+  end
+
+  def locale_pages
+    @current_page = @site.pages.find(params[:id])
+    @locale_pages = @current_page.locale_pages
+    render
+  end
+
+  def edit_locale
+    @current_page = @site.pages.find(params[:page_id])
+    @locale_page = @current_page.locale_pages.find(params[:id])
+    render
+  end
+
   def edit
+
     render
   end
 
@@ -34,6 +56,34 @@ class Comfy::Admin::Cms::PagesController < Comfy::Admin::Cms::BaseController
   rescue ActiveRecord::RecordInvalid
     flash.now[:danger] = I18n.t('comfy.admin.cms.pages.creation_failure')
     render :action => :new
+  end
+
+  def create_locale
+    if @page.save
+      block = @page.blocks.new(blocks_params["blocks_attributes"]["0"])
+      block.save
+      flash[:success] = I18n.t('comfy.admin.cms.pages.created')
+      redirect_to comfy_admin_cms_site_pages_path(site_id: @page.page.site_id)
+    else
+      flash[:notice] = @page.errors.full_messages.first
+
+      redirect_to new_locale_page_comfy_admin_cms_site_page_path(id: @page.page_id)
+    end
+  end
+
+  def update_locale
+    if @locale_page.save
+      block = @locale_page.blocks.first
+      block.attributes = blocks_params["blocks_attributes"]["0"]
+      block.save
+      flash[:success] = "Page updated"
+      redirect_to locale_pages_comfy_admin_cms_site_page_path(site_id: @locale_page.page.site_id)
+    else
+      flash[:notice] = @page.errors.full_messages.first
+
+      redirect_to new_locale_page_comfy_admin_cms_site_page_path(id: @page.page_id)
+    end
+
   end
 
   def update
@@ -49,6 +99,14 @@ class Comfy::Admin::Cms::PagesController < Comfy::Admin::Cms::BaseController
     @page.destroy
     flash[:success] = I18n.t('comfy.admin.cms.pages.deleted')
     redirect_to :action => :index
+  end
+
+  def destroy_locale
+    current_page = @site.pages.find(params[:page_id])
+    @locale_page = current_page.locale_pages.find(params[:id])
+    @locale_page.destroy
+    flash[:success] = "Locale content deleted"
+    redirect_to :action => :locale_pages
   end
 
   def form_blocks
@@ -115,6 +173,22 @@ protected
     @page.layout ||= (@page.parent && @page.parent.layout || @site.layouts.first)
   end
 
+  def build_cms_locale_page
+    
+    current_page = @site.pages.find(params[:page_id])
+    @page = current_page.locale_pages.new(locale_page_params)
+  #  @page.parent ||= curr || @site.pages.root)
+    @page.layout ||= @site.layouts.first
+  end
+
+  def load_locale_page
+    
+    current_page = @site.pages.find(params[:page_id])
+    @locale_page = current_page.locale_pages.find(params[:id])
+
+    @locale_page.attributes = locale_page_params
+  end
+
   def load_cms_page
     @page = @site.pages.find(params[:id])
     @page.attributes = page_params
@@ -140,6 +214,14 @@ protected
 
       render :inline => @page.render, :layout => layout, :content_type => 'text/html'
     end
+  end
+
+  def locale_page_params
+    params.require(:comfy_cms_locale_page).permit(:label, :content_cache, :layout_id, :is_published, :locale)
+  end
+
+  def blocks_params
+    params.fetch(:locale_page, {}).permit!
   end
 
   def page_params
