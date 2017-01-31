@@ -15,6 +15,13 @@ class Comfy::Cms::ContentController < Comfy::Cms::BaseController
   rescue_from ActiveRecord::RecordNotFound, :with => :page_not_found
 
   def show
+    if @cms_page.is_members_only
+      unless current_user.present?
+        flash[:notice] = "Please sign in to view this page"
+        return redirect_to new_user_session_path
+      end
+    end
+
     if @cms_page.target_page.present?
       redirect_to @cms_page.target_page.url(:relative)
     else
@@ -32,12 +39,15 @@ class Comfy::Cms::ContentController < Comfy::Cms::BaseController
 protected
 
   def render_page(status = 200)
+    if @cms_locale_page.present?
+      @cms_page = @cms_locale_page
+    end
     if @cms_layout = @cms_page.layout
       app_layout = (@cms_layout.app_layout.blank? || request.xhr?) ? false : @cms_layout.app_layout
       render  :inline       => @cms_page.content_cache,
               :layout       => app_layout,
               :status       => status,
-              :content_type => mime_type
+              :content_type => 'text/html'
     else
       render :plain => I18n.t('comfy.cms.content.layout_not_found'), :status => 404
     end
@@ -56,6 +66,9 @@ protected
 
   def load_cms_page
     @cms_page = @cms_site.pages.published.find_by_full_path!("/#{params[:cms_path]}")
+    if params[:locale].present? && params[:locale] != "en"
+      @cms_locale_page = @cms_page.locale_pages.where(locale: params[:locale]).first
+    end
   end
 
   def page_not_found

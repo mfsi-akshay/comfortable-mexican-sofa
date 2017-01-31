@@ -30,10 +30,6 @@
 = form.form_group :is_published do
   = form.check_box :is_published, :label => t('.is_published')
 
-= form.form_group :is_members_only do
-  = form.check_box :is_members_only, :label => "Visible to signed in members only"
-
-
 = render 'comfy/admin/cms/partials/page_form_after', :form => form
 
 = form.form_group :class => 'form-actions' do

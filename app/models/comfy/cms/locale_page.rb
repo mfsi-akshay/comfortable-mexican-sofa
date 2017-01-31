@@ -1,46 +1,21 @@
 # encoding: utf-8
 
-class Comfy::Cms::Page < ActiveRecord::Base
-  self.table_name = 'comfy_cms_pages'
+class Comfy::Cms::LocalePage < ActiveRecord::Base
+  self.table_name = 'comfy_cms_locale_pages'
 
-  cms_acts_as_tree :counter_cache => :children_count
-  cms_is_categorized
-  cms_is_mirrored
   cms_manageable
-  cms_has_revisions_for :blocks_attributes
 
-  # -- Relationships --------------------------------------------------------
-  belongs_to :site
+  belongs_to :page
   belongs_to :layout
-  belongs_to :target_page,
-    :class_name => 'Comfy::Cms::Page'
-  has_many :locale_pages, class_name: 'Comfy::Cms::LocalePage'
-
-  # -- Callbacks ------------------------------------------------------------
-  before_validation :assigns_label,
-                    :assign_parent,
-                    :escape_slug,
-                    :assign_full_path
-  before_create     :assign_position
-  after_save        :sync_child_full_paths!
-  after_find        :unescape_slug_and_path
 
   # -- Validations ----------------------------------------------------------
-  validates :site_id,
-    :presence   => true
-  validates :label,
-    :presence   => true
-  validates :slug,
-    :presence   => true,
-    :uniqueness => { :scope => :parent_id },
-    :unless     => lambda{ |p| p.site && (p.site.pages.count == 0 || p.site.pages.root == self) }
-  validates :layout,
-    :presence   => true
-  validate :validate_target_page
-  validate :validate_format_of_unescaped_slug
+
+  validates :locale, presence: :true, uniqueness: {scope: :page_id, message: 'Content already present'}
+
+
+  before_destroy :delete_blocks
 
   # -- Scopes ---------------------------------------------------------------
-  default_scope -> { order('comfy_cms_pages.position') }
   scope :published, -> { where(:is_published => true) }
 
   # -- Class Methods --------------------------------------------------------
@@ -132,6 +107,10 @@ protected
   def unescape_slug_and_path
     self.slug       = CGI::unescape(self.slug)      unless self.slug.nil?
     self.full_path  = CGI::unescape(self.full_path) unless self.full_path.nil?
+  end
+
+  def delete_blocks
+    self.blocks.each { |block| block.delete}
   end
 
 end

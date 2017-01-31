@@ -1,0 +1,50 @@
+<div class="page-header">
+
+<h1>Saved Locales for this page</h1>
+</div>
+
+
+
+<div class="col-md-12">
+				<div class="panel panel-default">
+					<div class="panel-body">
+						<div class="pull-center">
+						<%= link_to "Create new locale page", new_locale_page_comfy_admin_cms_site_page_path(site_id: @current_page.site_id), class: "btn btn-success"%>
+						</div>
+						<div class="table-container" style="margin-top:3%">
+							<% if @locale_pages.blank? %>
+								<div class="text-center">No Locale page found</div>
+							<% end %>
+							<% if @locale_pages.present? %>
+							<table class="table table-filter">
+                <thead>
+                  <tr>
+                    <th>Locale</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+
+								<tbody>
+
+                  <% @locale_pages.each do |locale_page| %>
+                    <tr>
+                      <td>
+                        <div class="col-sm-2">
+                          <a><%= locale_page.locale %></a>
+                        </div>
+                      </td>
+                      <td >
+                        <div>
+													<%= link_to "Edit", comfy_admin_cms_edit_locale_page_path(page_id: locale_page.page_id, id: locale_page.id), class: "btn btn-success" %>
+                          <%= link_to "Delete", comfy_admin_cms_destroy_locale_page_path(page_id: locale_page.page_id, id: locale_page.id), method: :delete, data: { confirm: 'Are you sure?' }, class: "btn btn-danger" %>
+                        </div>
+                      </td>
+                    </tr>
+                  <% end %>
+								</tbody>
+							</table>
+							<% end %>
+						</div>
+					</div>
+				</div>
+			</div>

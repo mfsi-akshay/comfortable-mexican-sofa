@@ -81,5 +81,12 @@ module Comfy
         paginate collection, :theme => 'comfy'
       end
     end
+
+    def available_locales
+      return [
+        { id: :nl, name: "Dutch" },
+        { id: :fr, name: "French" }
+      ]
+    end
   end
 end

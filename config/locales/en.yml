@@ -85,6 +85,11 @@ en:
             cancel: Cancel
             update: Update Site
             is_mirrored: Mirrored
+          locale_form:
+            create: Create Site
+            cancel: Cancel
+            update: Update Site
+            is_mirrored: Mirrored
 
         layouts:
           created: Layout created
@@ -144,6 +149,14 @@ en:
             revision:
               <<: *revision
           form:
+            select_target_page: No Redirect
+            preview: Preview
+            create: Create Page
+            cancel: Cancel
+            update: Update Page
+            is_published: Published
+            choose_link: Select page...
+          locale_form:
             select_target_page: No Redirect
             preview: Preview
             create: Create Page
