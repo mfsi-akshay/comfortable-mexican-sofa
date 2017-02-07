@@ -106,7 +106,7 @@ class Comfy::Admin::Cms::PagesController < Comfy::Admin::Cms::BaseController
     @locale_page = current_page.locale_pages.find(params[:id])
     @locale_page.destroy
     flash[:success] = "Locale content deleted"
-    redirect_to :action => :locale_pages
+    redirect_to locale_pages_comfy_admin_cms_site_page_path(site_id: @locale_page.page.site_id, id: @locale_page.page.id)
   end
 
   def form_blocks
@@ -174,7 +174,7 @@ protected
   end
 
   def build_cms_locale_page
-    
+
     current_page = @site.pages.find(params[:page_id])
     @page = current_page.locale_pages.new(locale_page_params)
   #  @page.parent ||= curr || @site.pages.root)
@@ -182,7 +182,7 @@ protected
   end
 
   def load_locale_page
-    
+
     current_page = @site.pages.find(params[:page_id])
     @locale_page = current_page.locale_pages.find(params[:id])
 
