@@ -207,7 +207,7 @@ protected
 
       # Make sure to use the site locale to render the preview becaue it might
       # be different from the admin locale.
-      I18n.locale = @cms_site.locale
+      #I18n.locale = @cms_site.locale
 
       # Chrome chokes on content with iframes. Issue #434
       response.headers['X-XSS-Protection'] = '0'
