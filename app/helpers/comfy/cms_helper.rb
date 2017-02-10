@@ -84,7 +84,7 @@ module Comfy
 
     def available_locales
       return [
-        { id: :fr, name: "French" }
+        { id: :fr, name: "French" },
         { id: :it, name: "Italian" }
       ]
     end
