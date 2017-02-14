@@ -23,7 +23,8 @@ class Comfy::Cms::ContentController < Comfy::Cms::BaseController
     end
 
     if @cms_page.target_page.present?
-      redirect_to @cms_page.target_page.url(:relative)
+      locale_for_redirect = params[:locale] || I18n.default_locale
+      return redirect_to ENV['root_url'] + locale_for_redirect + @cms_page.target_page.url(:relative)
     else
       respond_to do |format|
         format.html { render_page }
