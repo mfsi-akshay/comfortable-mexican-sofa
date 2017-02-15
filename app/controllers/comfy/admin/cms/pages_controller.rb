@@ -45,7 +45,6 @@ class Comfy::Admin::Cms::PagesController < Comfy::Admin::Cms::BaseController
   end
 
   def edit
-
     render
   end
 
@@ -77,10 +76,9 @@ class Comfy::Admin::Cms::PagesController < Comfy::Admin::Cms::BaseController
       block.attributes = blocks_params["blocks_attributes"]["0"]
       block.save
       flash[:success] = "Page updated"
-      redirect_to locale_pages_comfy_admin_cms_site_page_path(site_id: @locale_page.page.site_id)
+      redirect_to locale_pages_comfy_admin_cms_site_page_path(site_id: @locale_page.page.site_id, id: @locale_page.page.id)
     else
       flash[:notice] = @page.errors.full_messages.first
-
       redirect_to new_locale_page_comfy_admin_cms_site_page_path(id: @page.page_id)
     end
 
