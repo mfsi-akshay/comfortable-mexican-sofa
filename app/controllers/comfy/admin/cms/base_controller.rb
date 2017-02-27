@@ -43,7 +43,8 @@ protected
   end
 
   def set_locale
-    #I18n.locale = ComfortableMexicanSofa.config.admin_locale || (@site && @site.locale)
+    I18n.locale = :en
+    #ComfortableMexicanSofa.config.admin_locale || (@site && @site.locale)
     true
   end
 
